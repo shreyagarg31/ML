@@ -54,19 +54,10 @@ cost =  --- [ sum of ( y_pred - Y )   ]
 Use tf.reduce_sum and tf.pow 
 
 '''
-learning_rate=tf.Variable(0.01)
-training_epochs=tf.Variable(1000)
-M=tf.Variable()
-M=tf.multiply(X,W)
-y_pred=tf.add(M,b)
-cost=tf.Variable()
-error=tf.Variable()
-error=tf.subtract(y_predict,Y)
-total=tf.Variable()
-power=tf.Variable()
-power=tf.pow(error,2)
-total=tf.reduce_sum(power,n)
-cost=tf.divide(total,2*n)
+learning_rate = 0.01
+training_epochs = 1000
+y_pred = tf.add(tf.multiply(X,W),b)
+cost=tf.reduce_sum(tf.pow(y_pred-Y,2))/(2*n)
 
 
 # Gradient Descent Optimizer 
