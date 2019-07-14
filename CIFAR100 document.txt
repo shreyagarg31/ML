@@ -1,0 +1,36 @@
+This file contains explaination of network I used to classify images in a cifar100 dataset.
+After loading the data, the training and test labels have been converted to one hot encoded vector which helps in better prediction.Then to keep values in range of 0 to 1,
+we divided training and test images data by 255.0
+A new customized activation function is used known as TangentLinearUnit(TaLU).
+                                          y=  x if x>=0
+                                              tan(x) if alpha<x<0
+                                              tanh(alpha) if x<=alpha
+This alpha is a hyperparameter that can be varied. In the code written alpha=-0.05 is chosen but varying it may produce different and may be better results.This function 
+is supposed to provide a slightly better accuracy than LeakyreLU acc to some latest experiments.LeakyreLU with 0.01 can also be used.
+After that our training set is split into two parts in 80% and 20% to get validation set for better training of our data.
+After this we stack convolution layers for feature extraction.Every stack consists of:
+-> a conv2D layer with certain no of filters,kernel size(hyperparamter) chosen as 3 here(generally seen it is a good value to be taken),activation is TaLU and input shape is fed in first layer
+   after which each output of stack is passed to next stack.
+->after adding non linearity, batch normalization is added which is an efficient way of regularization and optimization making training faster.It can be added either after or before the activation layer.
+  Generally, according to latest experiments batch_norm added after it produce better results.Dropout can be used along withit but again experiments prove using dropout later in final layers gave better
+  results.
+->A maxPooling layer with size 2 is used to sample our input
+
+Here 9 conv layers have been used for better feature extraction.Again this number can be varied accordingly to get better results.
+
+Convolution layers are followed by Fully connected layers which help in better end to end training on features that have been provided by convolution layers.
+In these layers:
+     FC->BN->ACTIVATION->dropout
+Using dropout in fully connected layers after activation function provides strong regularizing effect avoiding overfitting.This order of layers is preferred to get better results as batch_norm prevents internal 
+covariant shift and rest of the regularization to reduce overfitting is done by dropout layer.
+Initially we start with a small value of 0.3 for dropout increasing to 0.5 in final layers.
+Kernel regularization can also be used as an alternative but dropouts and batch_norms have proved to be much better.
+In fully connected layers/dense layers separate activation layer is added of TaLU and in the layer linear is passed as an argument which canbe replaced by nothing since default is taken as linear.
+In the final layer softmax classifier is used to classify different images as it is multiclass classification.
+
+Number of neurons in FC can be any independent of neurons in previous layer. Adding too much of layers can also lead to overfitting!
+Then to compile adam optimizer has been used(by far produced best results),cross_entropy loss is chosen and accuracy metrics to record the loss and accuracy over epochs
+then to fit the data, suitable batch size 126 or 258 can be chosen and epochs may also vary from 40 to 20 or to 100.Smaller batches perform better.Using batch_norm, we can train faster,i.e, with lesser number of epochs.
+Now this is first of all fit on validation set and then used to predict on test data.
+
+    
